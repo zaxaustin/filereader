@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { UploadedFile, AnalysisResult, CalendarEvent, AnalysisGoal } from './types';
 import { analyzeFiles, generateCalendarEvents } from './services/geminiService';
@@ -18,6 +17,7 @@ const App: React.FC = () => {
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
     const [appState, setAppState] = useState<AppState>('upload');
     const [error, setError] = useState<string | null>(null);
+    const [resetKey, setResetKey] = useState(0);
 
     const handleFilesChange = useCallback((uploadedFiles: UploadedFile[]) => {
         setFiles(uploadedFiles);
@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
     const handleAnalyze = async (goal: AnalysisGoal) => {
         if (files.length === 0) {
-            setError("Please upload at least one file to analyze.");
+            setError("Please upload at least one file or add some notes to analyze.");
             return;
         }
         setAppState('loading');
@@ -55,6 +55,7 @@ const App: React.FC = () => {
         setCalendarEvents([]);
         setError(null);
         setAppState('upload');
+        setResetKey(prev => prev + 1); // Increment key to force FileUpload remount
     };
 
     return (
@@ -68,7 +69,7 @@ const App: React.FC = () => {
                         </h1>
                     </div>
                     <p className="text-slate-400 text-lg">
-                        Upload your files, choose your goal, and let Gemini do the heavy lifting.
+                        Upload files or paste notes, choose your goal, and let Gemini do the heavy lifting.
                     </p>
                 </header>
 
@@ -84,7 +85,7 @@ const App: React.FC = () => {
                                     onClick={handleReset}
                                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-300"
                                 >
-                                    Analyze New Files
+                                    Analyze New Content
                                 </button>
                             </div>
                         </div>
@@ -92,7 +93,7 @@ const App: React.FC = () => {
                     
                     {(appState === 'upload' || appState === 'configure') && (
                         <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-lg space-y-6">
-                            <FileUpload onFilesChange={handleFilesChange} />
+                            <FileUpload key={resetKey} onFilesChange={handleFilesChange} />
                             {appState === 'configure' && (
                                 <AnalysisConfiguration onStartAnalysis={handleAnalyze} />
                             )}
