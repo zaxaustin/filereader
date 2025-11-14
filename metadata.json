@@ -1,0 +1,5 @@
+{
+  "name": "Gemini File Organizer",
+  "description": "An intelligent file organizer that uses Gemini to analyze uploaded files, suggest next steps, and create calendar events to help you stay on top of your tasks.",
+  "requestFramePermissions": []
+}
